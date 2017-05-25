@@ -2,6 +2,8 @@
 
 A collection of tools and utilities I have written that I find useful for data science
 
+[Jupyter Notebook](https://github.com/crawles/ds_tools/blob/master/ds_tools.ipynb) with examples
+
 ## Tools
 
 * Random Forest model interpretation using the awesome [treeinterpreter](https://github.com/andosa/treeinterpreter) package
