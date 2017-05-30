@@ -2,3 +2,5 @@
 .ipynb_checkpoints
 wip*
 *.pyc
+metastore_db
+__pycache__

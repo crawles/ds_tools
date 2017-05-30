@@ -17,6 +17,7 @@ class ModelDF(object):
         self.id_var = id_var
         self.indep_var = indep_var
 
+
         self.y = df[dep_var]
         self.ID = df[id_var]
         self.X = df[indep_var]
