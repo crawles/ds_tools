@@ -23,7 +23,7 @@ def plot_roc(y_test, y_score, ax = None):
     plt.text(0.75, 0.03, 'AUC: {:1.3f}'.format(auc), size=24)
 
 
-def plot_importances(cl, column_names, n_features=10, ax=None, error_bars = False):
+def plot_importances(cl, column_names, plot=True, n_features=10, ax=None, error_bars = False):
     df_imp = pd.DataFrame({'features': column_names,
                            'importances': cl.feature_importances_})
     errors = np.std([tree.feature_importances_ for tree in cl.estimators_], axis=0)
@@ -34,6 +34,8 @@ def plot_importances(cl, column_names, n_features=10, ax=None, error_bars = Fals
         df_err_sub = df_errors.set_index('features').ix[df_imp_sub.index]
     else:
         df_err_sub = None
+    if not plot:
+        return df_imp_sub
     ax = df_imp_sub.plot(kind='barh', width=.7, legend=False, ax=ax, xerr=df_err_sub, ecolor='g')
     ax.grid(False, axis='y')
     for i,t in enumerate(df_imp_sub.index.tolist()):
