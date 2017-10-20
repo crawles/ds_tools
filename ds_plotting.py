@@ -21,7 +21,7 @@ def plot_roc(y_test, y_score, ax = None):
     ax.set_ylim(0, 1.02)
     plt.title('ROC', size=24)
     plt.text(0.75, 0.03, 'AUC: {:1.3f}'.format(auc), size=24)
-
+    return auc
 
 def plot_importances(cl, column_names, plot=True, n_features=10, ax=None, error_bars = False):
     df_imp = pd.DataFrame({'features': column_names,
@@ -48,9 +48,20 @@ def plot_importances(cl, column_names, plot=True, n_features=10, ax=None, error_
     ax.set_xlabel('Relative Importance', size=16)
     return df_imp_sub
 
-def plot_contrib(contribs, ax, label, pred):
-    ax = contribs.plot(kind='barh', width=0.7, ax=ax)
-    title = 'id: {}'.format(contribs.name)
+def plot_contrib(contribs_pos_and_neg, ax, label, pred):
+    green = (0.33333333333333331, 0.6588235294117647, 0.40784313725490196) 
+    red = (0.7686274509803922, 0.30588235294117649, 0.32156862745098042)
+    
+    contribs_pos = contribs_pos_and_neg.copy()
+    contribs_neg = contribs_pos_and_neg.copy()
+    contribs_pos[contribs_pos_and_neg < 0] = 0
+    contribs_neg[contribs_pos_and_neg >= 0] = 0
+    
+    ax = contribs_pos.plot(kind='barh', width=0.7, ax=ax, color=green, alpha=0.75)
+    ax = contribs_neg.plot(kind='barh', width=0.7, ax=ax, color=red, alpha=0.75)
+    ax.grid(False, axis='y')
+
+    title = 'id: {}'.format(contribs_pos_and_neg.name)
     title += '; label: {}'.format(label)
     title += '; pred: {:2.2f}'.format(pred)
     ax.set_title(title)
