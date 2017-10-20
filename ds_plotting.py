@@ -15,15 +15,15 @@ def plot_roc(y_test, y_score, ax = None):
     fpr,tpr,thresh = roc_curve(y_test, y_score)
     ax.plot([0, 1], [0, 1], linestyle='dashed', color='grey')
     ax.plot(fpr, tpr)
-    ax.set_ylabel('True Positive Rate')
-    ax.set_xlabel('False Positive Rate')
+    ax.set_ylabel('True Positive Rate', size=16)
+    ax.set_xlabel('False Positive Rate', size=16)
     ax.set_xlim(-0.01, 1)
     ax.set_ylim(0, 1.02)
-    plt.title('ROC')
-    plt.text(0.85, 0.03, 'AUC: {:1.3f}'.format(auc))
+    plt.title('ROC', size=24)
+    plt.text(0.75, 0.03, 'AUC: {:1.3f}'.format(auc), size=24)
 
 
-def plot_importances(cl, column_names, n_features=10, ax=None, error_bars = True):
+def plot_importances(cl, column_names, n_features=10, ax=None, error_bars = False):
     df_imp = pd.DataFrame({'features': column_names,
                            'importances': cl.feature_importances_})
     errors = np.std([tree.feature_importances_ for tree in cl.estimators_], axis=0)
@@ -35,13 +35,15 @@ def plot_importances(cl, column_names, n_features=10, ax=None, error_bars = True
     else:
         df_err_sub = None
     ax = df_imp_sub.plot(kind='barh', width=.7, legend=False, ax=ax, xerr=df_err_sub, ecolor='g')
+    ax.grid(False, axis='y')
     for i,t in enumerate(df_imp_sub.index.tolist()):
         t = ax.text(0.001, i-.06,t)
         t.set_bbox(dict(facecolor='white', alpha=0.4, edgecolor='grey'))
     ax.yaxis.set_major_formatter(plt.NullFormatter())
-    ax.set_title('Feature Importances')
+    ax.set_title('Feature Importances', size=20)
+    
     ax.set_xlim(0.0)
-    ax.set_xlabel('importance')
+    ax.set_xlabel('Relative Importance', size=16)
     return df_imp_sub
 
 def plot_contrib(contribs, ax, label, pred):
