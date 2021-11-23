@@ -115,7 +115,7 @@ def create_rolling_features_label(series, window_size, pred_offset, pred_n=1):
   # Make dataframe. Combine features and labels.
   label_ix = label_series.index[0:len(label_series) + 1 - pred_n]
   df = pd.DataFrame(y, columns=columns, index=label_ix)
-  df.index.name = 'pred_date'
+  df.index.name = 'prediction_date'
   # Populate dataframe with past sales.
   for day in range(window_size - 1, -1, -1):
     day_rel_label = pred_offset + window_size - day - 1
@@ -154,21 +154,26 @@ def is_between_dates(dates, start=None, end=None):
   return date_series.between(start, end).values
 
 
-def _count_holidays(dates, months, weeks):
+def _count_holidays(dates, months, weeks, days):
   """Count number of holidays spanned in prediction windows."""
   cal = calendar()
   holidays = cal.holidays(start=dates.min(), end=dates.max())
+  if months or weeks:
+      raise ValueError('Months or weeks not yet supported.')
 
-  def count_holidays_during_month(date):
+  def count_holidays(datetime):
     n_holidays = 0
-    beg = date
-    end = date + pd.DateOffset(months=months, weeks=weeks)
+    beg = datetime
+    end = datetime + pd.DateOffset(months=months, weeks=weeks, days=days)
+    # Hack to support days. TODO: Update to also work with months/weeks.
     for h in holidays:
-      if beg <= h < end:
-        n_holidays += 1
-    return n_holidays
+        if h.date() == datetime.date():
+            return 1
+#      if beg < h <= end:
+#        n_holidays += 1
+    return 0
 
-  return pd.Series(dates).apply(count_holidays_during_month)
+  return pd.Series(dates).apply(count_holidays)
 
 
 def _get_day_of_month(x):
@@ -176,15 +181,13 @@ def _get_day_of_month(x):
   return int(x.strftime('%d'))
 
 
-def add_date_features(df, dates, months, weeks, inplace=False):
+def add_date_features(df, dates, months, weeks, days, inplace=False):
   """Create features using date that is being predicted on."""
   if not inplace:
     df = df.copy()
-  df['doy'] = dates.dayofyear
+  df['dow'] = dates.dayofweek
   df['dom'] = dates.map(_get_day_of_month)
-  df['month'] = dates.month
-  df['year'] = dates.year
-  df['n_holidays'] = _count_holidays(dates, months, weeks).values
+  df['n_holidays'] = _count_holidays(dates, months, weeks, days).values
   return df
 
 
